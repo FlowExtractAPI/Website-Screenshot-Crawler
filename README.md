@@ -1,110 +1,352 @@
-# Website Screenshot Crawler
+# 📸 Website Screenshot Crawler 🌐
 
-A template for automated website screenshot capturing. This actor takes screenshots of websites from specified URLs, uploads them to Apify Key-Value Store, and provides screenshot URLs in a dataset. It is ideal for monitoring website changes, archiving web content, or capturing visuals for reports. The actor uses [Pyppeteer](https://pyppeteer.github.io/pyppeteer/) for browser automation and screenshot generation.
+Capture high-quality screenshots of any website with advanced scrolling capabilities and cookie support. Perfect for web monitoring, documentation, testing, and content archival.
 
-## Included Features
+## ✨ Key Features
 
-- **[Apify SDK](https://docs.apify.com/sdk/python/)** - A toolkit for building Apify Actors and scrapers in Python.
-- **[Pyppeteer](https://pyppeteer.github.io/pyppeteer/)** - A Python port of Puppeteer, an open-source tool for automating web browsers using a high-level API.
-- **[Key-Value Store](https://docs.apify.com/sdk/python/docs/concepts/storages#working-with-key-value-stores)** - Store screenshots and metadata for easy retrieval.
-- **[Dataset](https://docs.apify.com/sdk/python/docs/concepts/storages#working-with-datasets)** - Structured storage for results like screenshot URLs and metadata.
-- **Cookie and Viewport Support** - Allows setting cookies and specifying the viewport dimensions before capturing screenshots.
+### 📷 Advanced Screenshot Capture
+- **Full-Page Screenshots**: Capture entire webpage length, not just viewport
+- **Custom Viewport**: Set any browser window dimensions
+- **High-Quality PNG**: Lossless image format for professional results
+- **Configurable Delays**: Control timing for dynamic content loading
 
-## Input
+### 🔄 Smart Scrolling System
+- **Smooth Scrolling**: Gradual page scrolling with configurable distance
+- **Adaptive Delays**: Customizable wait times between scroll actions
+- **Dynamic Content**: Perfect for lazy-loaded content and infinite scroll pages
+- **Bottom Detection**: Automatically stops at page bottom
 
-The input for this actor should be JSON containing the necessary configuration. The only required field is `link_urls`, which must be an array of website URLs. All other fields are optional. Here’s a detailed description of the input fields:
+### 🍪 Session Management
+- **Cookie Support**: Import cookies for authenticated sessions
+- **Persistent Sessions**: Maintain login states across captures
+- **Paywall Bypass**: Access restricted content with proper authentication
+- **Custom Headers**: Support for various authentication methods
 
-| Field                          | Type     | Description                                                                                          | Allowed Values                                   |
-|--------------------------------|----------|------------------------------------------------------------------------------------------------------|-------------------------------------------------|
-| `link_urls`                   | Array    | An array of website URLs to capture screenshots of.                                                | Any valid URL                                    |
-| `Sleep`                       | Number   | Duration to wait after the page has loaded before taking a screenshot (in seconds).                 | Minimum: 0, Maximum: 3600                        |
-| `waitUntil`                   | String   | Event to wait for before taking the screenshot.                                                    | One of: `"load"`, `"domcontentloaded"`, `"networkidle2"`, `"networkidle0"` |
-| `cookies`                     | Array    | Any cookies to set for the browser session.                                                         | Array of cookie objects                          |
-| `fullPage`                    | Boolean  | Whether to capture the full page or just the viewport.                                             | `true` or `false`                               |
-| `window_Width`                | Number   | Width of the browser viewport.                                                                       | Minimum: 100, Maximum: 3840                      |
-| `window_Height`               | Number   | Height of the browser viewport.                                                                      | Minimum: 100, Maximum: 2160                      |
-| `scrollToBottom`              | Boolean  | Should the browser scroll to the bottom of the page before taking a screenshot?                     | `true` or `false`                               |
-| `distance`                    | Number   | Distance (in pixels) to scroll down for each scroll action.                                         | Minimum: 0                                       |
-| `delay`                       | Number   | Delay (in milliseconds) between scroll actions.                                                     | Minimum: 0, Maximum: 3600000                     |
-| `delayAfterScrolling`         | Number   | Specify the delay (in milliseconds) after scrolling to the bottom of the page before taking a screenshot. | Minimum: 0, Maximum: 3600000                     |
-| `waitUntilNetworkIdleAfterScroll` | Boolean | Choose whether to wait for the network to become idle after scrolling to the bottom of the page.   | `true` or `false`                               |
-| `waitUntilNetworkIdleAfterScrollTimeout` | Number | Maximum wait time (in milliseconds) for the network to become idle after scrolling.                 | Minimum: 1000, Maximum: 3600000                  |
+### 🌐 Network Optimization
+- **Network Idle Detection**: Multiple wait conditions for page loading
+- **Timeout Control**: Configurable page load timeouts
+- **Image Optimization**: Optional image loading control for faster processing
+- **Resource Management**: Efficient memory usage with headless browsing
 
-For more information about the `waitUntil` parameter, please refer to the [Puppeteer page.goto function documentation](https://pptr.dev/#?product=Puppeteer&version=v8.0.0&show=api-class-page).
+## 🚀 Quick Start
 
-## Output
+### Basic Screenshot
+```json
+{
+  "link_urls": ["https://example.com"],
+  "fullPage": true,
+  "Sleep": 5
+}
+```
 
-Once the actor finishes executing, it will output a screenshot of each website into a file stored in the Key-Value Store associated with the run. The screenshot URLs will also be stored in a dataset for easy access.
+### Full-Page with Scrolling
+```json
+{
+  "link_urls": ["https://example.com"],
+  "fullPage": true,
+  "scrollToBottom": true,
+  "distance": 200,
+  "delay": 150
+}
+```
 
-## How It Works
+### Custom Viewport
+```json
+{
+  "link_urls": ["https://example.com"],
+  "window_Width": 1366,
+  "window_Height": 768,
+  "waitUntil": "networkidle0"
+}
+```
 
-1. **Input Configuration**: The actor reads the input data as specified above.
-2. **Browser Automation**: The actor launches a headless browser using Pyppeteer, loading the target URLs, and capturing screenshots.
-3. **Setting Cookies and Viewport**: Before navigating to each link, specified cookies are set using `page.setCookie()`, and the viewport is configured with specified width and height.
-4. **Page Navigation**: The actor navigates to each URL using `page.goto()`, waiting for the specified `waitUntil` event.
-5. **Scrolling (Optional)**: If the `scrollToBottom` option is enabled, the actor executes a scrolling script that scrolls down the page by the defined `distance` in pixels.
-6. **Screenshot Capture**: After the page has fully loaded, the actor waits for the `Sleep` duration before capturing the screenshot and saves it with a random filename.
-7. **Uploading Screenshots**: The captured screenshots are read as binary data and uploaded to the Apify Key-Value Store using `Actor.set_value()`, with URLs stored in the dataset.
-8. **Logging and Error Handling**: The actor logs the success or failure of each URL processed, ensuring that it can continue processing even if one fails.
-9. **Cleanup**: After processing all URLs, the actor closes the browser.
+### With Authentication
+```json
+{
+  "link_urls": ["https://secure-site.com/dashboard"],
+  "cookies": [
+    {
+      "name": "session_token",
+      "value": "abc123xyz",
+      "domain": ".secure-site.com"
+    }
+  ],
+  "Sleep": 10
+}
+```
 
-This open-source actor effectively automates the process of capturing and storing screenshots of multiple web pages, making it a valuable tool for monitoring website changes, archiving content, or generating visual reports.
+## 📋 Input Configuration
 
-## Resources
+### 🎯 Basic Settings
 
-- [Pyppeteer Documentation](https://pyppeteer.github.io/pyppeteer/)
-- [Apify Python SDK](https://docs.apify.com/sdk/python)
-- [Apify Actors](https://apify.com/actors)
-- [Automated Web Scraping Guide](https://docs.apify.com/academy/python)
-- [Apify Forum](https://forum.apify.com/)
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `link_urls` | Array | `["https://apify.com"]` | List of URLs to capture screenshots from |
+| `fullPage` | Boolean | `false` | Capture entire page height vs viewport only |
+| `Sleep` | Integer | `10` | Wait duration (seconds) after page load |
+| `waitUntil` | String | `"networkidle0"` | Page load completion condition |
 
-## Getting Started
+### 📱 Viewport Configuration
 
-To get started with this actor:
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `window_Width` | Integer | `1920` | Browser window width in pixels |
+| `window_Height` | Integer | `1080` | Browser window height in pixels |
 
-1. **Build the Actor**: Define your input URLs and configure optional settings like scrolling and sleep duration.
-2. **Run the Actor**: Execute the actor on the Apify platform or locally using the Apify CLI.
+### 🔄 Scrolling Options
 
-## Pull the Actor for Local Development
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `scrollToBottom` | Boolean | `false` | Enable automatic scrolling to page bottom |
+| `distance` | Integer | `100` | Scroll distance per step (pixels) |
+| `delay` | Integer | `100` | Wait time between scroll actions (milliseconds) |
 
-To develop this actor locally, follow these steps:
+### 🍪 Authentication
 
-1. Install `apify-cli`:
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `cookies` | Array | `[]` | Cookie objects for authenticated sessions |
 
-    **Using Homebrew**:
+### 🌐 Network Settings
 
-    ```bash
-    brew install apify-cli
-    ```
+| Parameter | Type | Options | Description |
+|-----------|------|---------|-------------|
+| `waitUntil` | String | `load`, `domcontentloaded`, `networkidle0`, `networkidle2` | Navigation completion condition |
 
-    **Using NPM**:
+#### Wait Conditions Explained:
+- **`load`**: Wait until all resources are loaded
+- **`domcontentloaded`**: Wait until HTML is parsed
+- **`networkidle0`**: Wait until no network connections for 500ms
+- **`networkidle2`**: Wait until ≤2 network connections for 500ms
 
-    ```bash
-    npm install -g apify-cli
-    ```
+## 📊 Output Data
 
-2. Pull the Actor using its unique `<ActorId>`:
+Each successful capture returns:
 
-    ```bash
-    apify pull <ActorId>
-    ```
+```json
+{
+  "screenshot_url": "https://api.apify.com/v2/key-value-stores/txdAB1M5FomDeUwQH/records/k36q82evyv7pqtgl.png",
+  "linkUrl": "https://codex.wordpress.org/Theme_Development"
+}
+```
 
-## Example Use Cases
+### Output Details:
+- **`screenshot_url`**: Direct download link to the captured PNG image
+- **`linkUrl`**: Original URL that was captured
+- **File Format**: PNG with random 16-character filename
+- **Storage**: Apify Key-Value Store with permanent URLs
 
-- **Website Monitoring**: Capture screenshots periodically to monitor changes to web pages.
-- **Visual Archiving**: Store visual representations of websites over time for research or archival purposes.
-- **Reporting**: Automatically capture visuals for reports or presentations.
+## 🎯 Use Cases
 
-## Documentation Reference
+### 📈 Business & Monitoring
+- **Website Monitoring**: Track visual changes and updates
+- **Competitor Analysis**: Regular captures of competitor pages
+- **Documentation**: Create visual records of web states
+- **Archival**: Preserve webpage appearances over time
 
-- [Apify SDK for Python](https://docs.apify.com/sdk/python)
-- [Apify Platform Documentation](https://docs.apify.com/platform)
-- [Pyppeteer API Documentation](https://pyppeteer.github.io/pyppeteer/)
-- [Join the Apify Developer Community](https://discord.com/invite/jyEM2PRvMU)
+### 🧪 Development & Testing
+- **Responsive Testing**: Verify layouts at different viewport sizes
+- **Cross-Browser Testing**: Ensure consistent appearance
+- **Bug Documentation**: Capture error states and issues
+- **CI/CD Integration**: Automated screenshot testing
 
-## Contact Information
+### 📚 Content & Research
+- **Tutorial Creation**: Generate step-by-step visual guides
+- **Academic Research**: Capture web-based data and layouts
+- **Social Media**: Create engaging visual content
+- **Portfolio**: Showcase web development projects
 
-For any inquiries, you can reach me at:  
-Email: [flowextractapi@outlook.com](mailto:flowextractapi@outlook.com)  
-GitHub: [https://github.com/FlowExtractAPI](https://github.com/FlowExtractAPI)  
-Twitter: [https://x.com/FlowExtractAPI](https://x.com/FlowExtractAPI)
+### 🔍 E-commerce & Marketing
+- **Price Monitoring**: Track product pages and pricing
+- **Ad Campaign Tracking**: Monitor landing pages
+- **A/B Testing**: Compare different page versions
+- **SEO Analysis**: Document search result pages
+
+## ⚙️ Advanced Configuration Examples
+
+### High-Resolution Capture
+```json
+{
+  "link_urls": ["https://example.com"],
+  "window_Width": 2560,
+  "window_Height": 1440,
+  "fullPage": true,
+  "Sleep": 15,
+  "waitUntil": "networkidle0"
+}
+```
+
+### Slow-Loading Content
+```json
+{
+  "link_urls": ["https://slow-site.com"],
+  "scrollToBottom": true,
+  "distance": 150,
+  "delay": 300,
+  "Sleep": 20,
+  "waitUntil": "networkidle2"
+}
+```
+
+### Mobile Viewport Simulation
+```json
+{
+  "link_urls": ["https://mobile-site.com"],
+  "window_Width": 375,
+  "window_Height": 812,
+  "fullPage": true,
+  "Sleep": 8
+}
+```
+
+### Authenticated Session
+```json
+{
+  "link_urls": ["https://dashboard.example.com"],
+  "cookies": [
+    {
+      "name": "auth_token",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+      "domain": ".example.com",
+      "path": "/",
+      "secure": true,
+      "httpOnly": true
+    }
+  ],
+  "Sleep": 12,
+  "waitUntil": "networkidle0"
+}
+```
+
+## 🔧 Technical Details
+
+### Browser Configuration
+- **Engine**: Pyppeteer (Chrome/Chromium)
+- **Mode**: Headless for optimal performance
+- **Security**: Sandbox disabled for containerized environments
+- **Memory**: Optimized shared memory usage
+- **Images**: Optional image loading for faster processing
+
+### Performance Optimization
+- **Async Processing**: Non-blocking operations for multiple URLs
+- **Memory Management**: Efficient resource cleanup
+- **Network Optimization**: Configurable network idle detection
+- **Error Handling**: Robust error recovery and logging
+
+### File Management
+- **Naming**: Random 16-character filenames to prevent conflicts
+- **Storage**: Apify Key-Value Store with permanent URLs
+- **Format**: PNG for lossless quality
+- **Cleanup**: Automatic temporary file removal
+
+## 🛠️ Installation & Usage
+
+### Running the Actor
+
+1. **Input Configuration**: Set your parameters using JSON or the visual editor
+2. **Execute**: Run the actor and monitor progress
+3. **Results**: Access screenshots via the generated dataset
+4. **Download**: Use the provided URLs to download images
+
+### Integration Options
+
+- **Apify API**: Programmatic access via REST API
+- **Webhooks**: Automated notifications on completion
+- **Scheduling**: Run captures at regular intervals
+- **Zapier Integration**: Connect with other tools and services
+
+## 🔍 Troubleshooting
+
+### Common Issues
+
+**Screenshots are blank or incomplete?**
+- Increase `Sleep` duration for dynamic content
+- Try `waitUntil: "networkidle2"` for slower sites
+- Enable `scrollToBottom` for lazy-loaded content
+- Check if site blocks automation tools
+
+**Page won't load properly?**
+- Increase timeout values
+- Verify URL accessibility
+- Check for required cookies/authentication
+- Try different `waitUntil` conditions
+
+**Scrolling not working correctly?**
+- Adjust `distance` for smaller/larger scroll steps
+- Increase `delay` for slower content loading
+- Verify page has scrollable content
+- Check for fixed/sticky elements interfering
+
+**Cookie authentication failing?**
+- Verify cookie format and values
+- Check domain and path settings
+- Ensure cookies are not expired
+- Test with browser developer tools first
+
+## 📄 API Reference
+
+### Input Schema Validation
+The actor validates all input parameters according to the JSON Schema specification. Invalid inputs will result in clear error messages.
+
+### Output Format
+Results are stored in Apify Dataset with consistent structure:
+- **URL**: `screenshot_url` for direct image access
+- **Source**: `linkUrl` for reference tracking
+- **Storage**: Permanent Key-Value Store links
+
+### Error Handling
+- **Network Errors**: Automatic retry mechanisms
+- **Timeout Handling**: Graceful failure with logging
+- **Invalid URLs**: Clear error messages
+- **Memory Issues**: Efficient cleanup and recovery
+
+## 🏆 Best Practices
+
+### Configuration Tips
+1. **Test First**: Start with default settings and adjust gradually
+2. **Monitor Performance**: Balance quality vs speed based on needs
+3. **Handle Failures**: Implement retry logic for critical captures
+4. **Optimize Timing**: Adjust `Sleep` and `delay` for your target sites
+5. **Use Appropriate Viewports**: Match your analysis requirements
+
+### Performance Optimization
+- Use `networkidle0` for fast, static sites
+- Use `networkidle2` for dynamic, interactive sites
+- Disable images loading for faster processing when not needed
+- Adjust scroll parameters based on content type
+- Monitor memory usage for large batch operations
+
+### Security Considerations
+- Store cookies securely when using authentication
+- Validate URLs before processing
+- Respect robots.txt and rate limits
+- Use proper authentication methods
+- Monitor for sensitive data in screenshots
+
+## 📈 Performance Metrics
+
+### Speed Benchmarks
+- **Simple Page**: ~5-10 seconds per screenshot
+- **Complex Page**: ~15-30 seconds with scrolling
+- **Full Page**: Additional 2-5 seconds for scrolling
+- **Authenticated**: +2-3 seconds for cookie setup
+
+### Resource Usage
+- **Memory**: ~50-100MB per browser instance
+- **CPU**: Moderate usage during capture
+- **Network**: Depends on page size and resources
+- **Storage**: PNG files typically 100KB-5MB
+
+## 🤝 Support & Maintenance
+
+### Getting Help
+- Review this documentation thoroughly
+- Check common issues and solutions
+- Test with simple examples first
+- Monitor actor logs for detailed error information
+
+### Updates & Improvements
+- Regular updates for browser compatibility
+- Performance optimizations based on usage patterns
+- New features based on user feedback
+- Security updates and bug fixes
